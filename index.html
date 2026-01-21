@@ -396,15 +396,7 @@ async function addTx(){
   if(await hash(pin.value)!==PIN_HASH) return alert("Wrong PIN");
   const r=receiver.value,p=+points.value;
   data[r]+=p;
-const sign = p > 0 ? "+" : "";
-const message = `${sign}${p} to ${r} for ${reason.value}`;
-
-data.log.push({
-  u: r,
-  m: message,
-  t: new Date().toLocaleString()
-});
-
+  data.log.push({u:r,m:`${p>0?"+"+p:p} (${reason.value})`,t:new Date().toLocaleString()});
   await updateDoc(ref,{Aakarsh:data.Aakarsh,Rishika:data.Rishika,log:arrayUnion(data.log.at(-1))});
   load();
 }
@@ -415,9 +407,7 @@ async function redeem(){
   const r=redeemPerson.value,p=+redeemPoints.value;
   if(data[r]<p) return alert("Not enough points");
   data[r]-=p;
-const message = `${p} redeemed by ${r} for ${redeemFor.value}`;
-
-  data.log.push({u:r,m:message,t:new Date().toLocaleString()});
+  data.log.push({u:r,m:`redeemed ${p} for ${redeemFor.value}`,t:new Date().toLocaleString()});
   await updateDoc(ref,{Aakarsh:data.Aakarsh,Rishika:data.Rishika,log:arrayUnion(data.log.at(-1))});
   load();
 }
@@ -438,4 +428,3 @@ load();
 </script>
 </body>
 </html>
-
