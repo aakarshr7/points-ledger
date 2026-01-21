@@ -108,80 +108,115 @@
   }
 
   async function loadData() {
-    const snap = await getDoc(docRef);
-    if (snap.exists()) {
-      data = snap.data();
-      document.getElementById("youPoints").textContent = data.Aakarsh;
-      document.getElementById("herPoints").textContent = data.Rishika;
-      document.getElementById("log").innerHTML = "";
-      data.log.forEach(item => {
-        const li = document.createElement("li");
-        li.textContent = item;
-        document.getElementById("log").appendChild(li);
-      });
-    } else {
-      await setDoc(docRef, data);
-    }
+  const snap = await getDoc(docRef);
+  if (snap.exists()) {
+    data = snap.data();
+    document.getElementById("youPoints").textContent = data.Aakarsh;
+    document.getElementById("herPoints").textContent = data.Rishika;
+    document.getElementById("log").innerHTML = "";
+
+    // Sort by sortTime before displaying
+    const sortedLog = [...data.log].sort((a, b) => new Date(a.sortTime) - new Date(b.sortTime));
+
+    sortedLog.forEach(item => {
+      const li = document.createElement("li");
+      li.textContent = `${item.displayTime} — ${item.message}`;
+      document.getElementById("log").appendChild(li);
+    });
+  } else {
+    await setDoc(docRef, data);
   }
+}
+
 
   async function addTransaction() {
-    if (!(await checkPin())) {
-      alert("❌ Incorrect PIN");
-      return;
-    }
-
-    const receiver = document.getElementById("receiver").value;
-    const points = parseInt(document.getElementById("points").value, 10);
-    const reason = document.getElementById("reason").value;
-
-    if (receiver === "Aakarsh") {
-      data.Aakarsh += points;
-    } else {
-      data.Rishika += points;
-    }
-    let entry; 
-    if (points < 0) { 
-      entry = `${receiver === "Aakarsh" ? "Rishika" : "Aakarsh"} -- deducted ${Math.abs(points)} points from ${receiver} for ${reason}`; } 
-    else { entry = `${receiver === "Aakarsh" ? "Rishika" : "Aakarsh"} -- rewarded ${points} points to ${receiver} for ${reason}`; }
-    
-    data.log.push(entry);
-
-    await updateDoc(docRef, {
-      Aakarsh: data.Aakarsh,
-      Rishika: data.Rishika,
-      log: arrayUnion(entry)
-    });
-
-    loadData();
+  if (!(await checkPin())) {
+    alert("❌ Incorrect PIN");
+    return;
   }
+
+  const receiver = document.getElementById("receiver").value;
+  const points = parseInt(document.getElementById("points").value, 10);
+  const reason = document.getElementById("reason").value;
+
+  if (receiver === "you") {
+    data.Aakarsh += points;
+  } else {
+    data.Rishika += points;
+  }
+
+  // 🕒 Create timestamps
+  const now = new Date();
+  const displayTime = now.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }); // IST
+  const sortTime = now.toISOString(); // UTC ISO string for sorting
+
+  // ✅ Different message depending on positive or negative points
+  let message;
+  if (points < 0) {
+    message = `${receiver === "Aakarsh" ? "Rishika" : "Aakarsh"} -- deducted ${Math.abs(points)} points from ${receiver} for ${reason}`;
+  } else {
+    message = `${receiver === "Aakarsh" ? "Rishika" : "Aakarsh"} -- rewarded ${points} points to ${receiver} for ${reason}`;
+  }
+
+  // Transaction object with both fields
+  const entry = {
+    message,
+    displayTime,
+    sortTime
+  };
+
+  data.log.push(entry);
+
+  await updateDoc(docRef, {
+    Aakarsh: data.Aakarsh,
+    Rishika: data.Rishika,
+    log: arrayUnion(entry)
+  });
+
+  loadData();
+}
+
 
   async function redeemPoints() {
-    if (!(await checkPin())) {
-      alert("❌ Incorrect PIN");
-      return;
-    }
-
-    const person = document.getElementById("redeemPerson").value;
-    const points = parseInt(document.getElementById("redeemPoints").value, 10);
-    const redeemFor = document.getElementById("redeemFor").value;
-
-    if (person === "Aakarsh") {
-      data.Aakarsh -= points;
-    } else {
-      data.Rishika -= points;
-    }
-
-    const entry = `${person === "Aakarsh" ? "Aakarsh" : "Rishika"} -- redeemed ${points} points for ${redeemFor}`;
-    data.log.push(entry);
-
-    await updateDoc(docRef, {
-      Aakarsh: data.Aakarsh,
-      Rishika: data.Rishika,
-      log: arrayUnion(entry)
-    });
-
-    loadData();
+  if (!(await checkPin())) {
+    alert("❌ Incorrect PIN");
+    return;
   }
+
+  const person = document.getElementById("redeemPerson").value;
+  const points = parseInt(document.getElementById("redeemPoints").value, 10);
+  const redeemFor = document.getElementById("redeemFor").value;
+
+  if (person === "you") {
+    data.Aakarsh -= points;
+  } else {
+    data.Rishika -= points;
+  }
+
+  // 🕒 Create timestamps
+  const now = new Date();
+  const displayTime = now.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }); // IST
+  const sortTime = now.toISOString(); // UTC ISO string for sorting
+
+  const message = `${person === "Aakarsh" ? "Rishika" : "Aakarsh"} redeemed ${points} points for ${redeemFor}`;
+
+  const entry = {
+    message,
+    displayTime,
+    sortTime
+  };
+
+  data.log.push(entry);
+
+  await updateDoc(docRef, {
+    Aakarsh: data.Aakarsh,
+    Rishika: data.Rishika,
+    log: arrayUnion(entry)
+  });
+
+  loadData();
+}
+
 
   // Attach event listeners
   document.getElementById("logBtn").addEventListener("click", addTransaction);
@@ -193,6 +228,7 @@
 
 </body>
 </html>
+
 
 
 
