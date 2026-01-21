@@ -17,6 +17,36 @@
     ul { list-style: none; padding: 0; }
     li { background: white; margin-bottom: 8px; padding: 10px; border-radius: 10px; font-size: 0.9rem; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
     .footer { text-align: center; font-size: 0.8rem; color: #666; margin-top: 20px; }
+    .sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 220px;
+  background: #ffffff;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.08);
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.sidebar h3 {
+  margin-top: 0;
+  text-align: center;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar li {
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+  background: #f6f7fb;
+  padding: 8px;
+  border-radius: 8px;
+}
+
   </style>
 </head>
 <body>
@@ -61,6 +91,17 @@
   <input type="number" id="redeemPoints" placeholder="Points to redeem" />
   <input type="text" id="redeemFor" placeholder="Redeemed for (favor…)" />
   <button class="redeem" id="redeemBtn">Redeem</button>
+</div>
+<div class="sidebar">
+  <h3>📖 Rules</h3>
+  <ul>
+    <li>➕ Points can be added or deducted with a valid reason.</li>
+    <li>🔐 Transactions require the correct PIN.</li>
+    <li>🎁 Redeem only if balance > 0.</li>
+    <li>⚠️ Cannot redeem more points than available.</li>
+    <li>🕒 All transactions are timestamped and logged.</li>
+    <li>💰 Points have no cash value.</li>
+  </ul>
 </div>
 
 <h3>📜 Transaction History</h3>
@@ -187,7 +228,26 @@
   const points = parseInt(document.getElementById("redeemPoints").value, 10);
   const redeemFor = document.getElementById("redeemFor").value;
 
-  if (person === "you") {
+  // ✅ Check current balance
+  const currentBalance = person === "Aakarsh" ? data.Aakarsh : data.Rishika;
+
+  if (points <= 0) {
+    alert("⚠️ You must enter a positive number of points to redeem.");
+    return;
+  }
+
+  if (currentBalance <= 0) {
+    alert(`⚠️ ${person} has no points to redeem.`);
+    return;
+  }
+
+  if (points > currentBalance) {
+    alert(`⚠️ Cannot redeem more points than available. Current balance: ${currentBalance}`);
+    return;
+  }
+
+  // Deduct points
+  if (person === "Aakarsh") {
     data.Aakarsh -= points;
   } else {
     data.Rishika -= points;
@@ -198,7 +258,7 @@
   const displayTime = now.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }); // IST
   const sortTime = now.toISOString(); // UTC ISO string for sorting
 
-  const message = `${person === "Aakarsh" ? "Aakarsh" : "Rishika"} redeemed ${points} points for ${redeemFor}`;
+  const message = `${person} redeemed ${points} points for ${redeemFor}`;
 
   const entry = {
     message,
@@ -228,6 +288,7 @@
 
 </body>
 </html>
+
 
 
 
