@@ -92,16 +92,17 @@ body.sidebar-open {
 .overlay {
   position: fixed;
   inset: 0;
-  background: transparent;
+  backdrop-filter: blur(2px);
+  background: rgba(0,0,0,0.15);
   display: none;
   z-index: 9;
 }
+
 
 .overlay.show {
   display: block;
 }
 
-.overlay.show { display: block; }
 
 /* =====================
    LAYOUT
@@ -224,14 +225,9 @@ li.rishika { border-left: 4px solid var(--rishika); }
 /* Blur background when sidebar is open */
 @media (max-width: 768px) {
   body.sidebar-open .main-wrapper {
-    filter: blur(6px);
-    pointer-events: none;
-    user-select: none;
-  }
+  filter: blur(6px);
+}
 
-  body.sidebar-open .sidebar {
-    filter: none;
-  }
 }
 
 
@@ -314,18 +310,20 @@ const overlay = document.getElementById("overlay");
 const toggleSidebar = document.getElementById("toggleSidebar");
 const darkToggle = document.getElementById("darkToggle");
 
-
 toggleSidebar.onclick = () => {
   sidebar.classList.add("open");
   overlay.classList.add("show");
   document.body.classList.add("sidebar-open");
 };
 
-overlay.onclick = () => {
+overlay.onclick = closeSidebar;
+window.addEventListener("resize", closeSidebar);
+
+function closeSidebar() {
   sidebar.classList.remove("open");
   overlay.classList.remove("show");
   document.body.classList.remove("sidebar-open");
-};
+}
 
 
 /* 🔥 FIREBASE CONFIG */
@@ -426,8 +424,17 @@ const message = `${p} redeemed by ${r} for ${redeemFor.value}`;
 }
 
 /* UI */
-logBtn.onclick=addTx;
-redeemBtn.onclick=redeem;
+
+logBtn.onclick = () => {
+  console.log("Log clicked");
+  addTx();
+};
+
+redeemBtn.onclick = () => {
+  console.log("Log clicked");
+  redeem();
+};
+;
 
 darkToggle.onclick=()=>{
   document.body.classList.toggle("dark");
@@ -441,6 +448,7 @@ load();
 </script>
 </body>
 </html>
+
 
 
 
