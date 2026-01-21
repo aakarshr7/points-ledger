@@ -396,10 +396,10 @@ async function addTx(){
   if(await hash(pin.value)!==PIN_HASH) return alert("Wrong PIN");
   const r=receiver.value,p=+points.value;
   data[r]+=p;
-const sign = p > 0 ? "+" : "";
-const message = `${sign}${p} to ${r} for ${reason.value}`;
+  const sign = p > 0 ? "+" : "";
+  const message = `${sign}${p} to ${r} for ${reason.value}`;
 
-data.log.push({
+  data.log.push({
   u: r,
   m: message,
   t: new Date().toLocaleString()
@@ -438,4 +438,5 @@ load();
 </script>
 </body>
 </html>
+
 
