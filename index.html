@@ -2,69 +2,85 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Points Transaction Log</title>
+  <title>🏆 Points Ledger</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <style>
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
       background: #f6f7fb;
       padding: 20px;
-      max-width: 700px;
+      max-width: 720px;
       margin: auto;
     }
+
     h1, h3 {
       text-align: center;
     }
+
     .scoreboard {
       display: flex;
-      justify-content: space-around;
+      justify-content: space-between;
+      gap: 12px;
       margin: 20px 0;
     }
+
     .card {
       background: white;
-      padding: 15px;
-      border-radius: 12px;
-      width: 45%;
+      padding: 16px;
+      border-radius: 14px;
+      width: 100%;
       text-align: center;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
     }
+
     .points {
-      font-size: 2rem;
+      font-size: 2.2rem;
       font-weight: bold;
     }
+
     .controls {
       background: white;
-      padding: 15px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-      margin-bottom: 20px;
+      padding: 16px;
+      border-radius: 14px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      margin-bottom: 16px;
     }
+
     input, select, button {
-      padding: 8px;
-      margin: 6px 0;
       width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      font-size: 1rem;
     }
+
     button {
       cursor: pointer;
-      border-radius: 8px;
+      border-radius: 10px;
       border: none;
       background: #4f46e5;
       color: white;
-      font-size: 1rem;
+      margin-top: 12px;
     }
+
     button.redeem {
       background: #16a34a;
     }
+
     ul {
       list-style: none;
       padding: 0;
     }
+
     li {
       background: white;
       margin-bottom: 8px;
       padding: 10px;
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 0.9rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
     }
+
     .footer {
       text-align: center;
       font-size: 0.8rem;
@@ -75,28 +91,33 @@
 </head>
 <body>
 
-<h1>🏆 Points Transaction Log</h1>
+<h1>🏆 Points Ledger</h1>
 
 <div class="scoreboard">
   <div class="card">
-    <h3>You</h3>
+    <h3>Aakarsh</h3>
     <div class="points" id="youPoints">0</div>
   </div>
   <div class="card">
-    <h3>Her</h3>
+    <h3>Rishika</h3>
     <div class="points" id="herPoints">0</div>
   </div>
+</div>
+
+<div class="controls">
+  <h3>🔐 Security</h3>
+  <input type="password" id="pin" placeholder="Enter PIN" />
 </div>
 
 <div class="controls">
   <h3>➕ Add / Deduct Points</h3>
 
   <select id="receiver">
-    <option value="you">You</option>
-    <option value="her">Her</option>
+    <option value="you">Aakarsh</option>
+    <option value="her">Rishika</option>
   </select>
 
-  <input type="number" id="points" placeholder="e.g. 5000 (negative to deduct)" />
+  <input type="number" id="points" placeholder="e.g. 5000 (negative allowed)" />
   <input type="text" id="reason" placeholder="Reason" />
 
   <button onclick="addTransaction()">Log Transaction</button>
@@ -106,12 +127,12 @@
   <h3>🎁 Redeem Points</h3>
 
   <select id="redeemPerson">
-    <option value="you">You</option>
-    <option value="her">Her</option>
+    <option value="you">Aakarsh</option>
+    <option value="her">Rishika</option>
   </select>
 
   <input type="number" id="redeemPoints" placeholder="Points to redeem" />
-  <input type="text" id="redeemFor" placeholder="Redeemed for (coffee, favor, etc.)" />
+  <input type="text" id="redeemFor" placeholder="Redeemed for (coffee, favor…)" />
 
   <button class="redeem" onclick="redeemPoints()">Redeem</button>
 </div>
@@ -120,75 +141,47 @@
 <ul id="log"></ul>
 
 <div class="footer">
-  Points have no cash value. Terms subject to vibes & mood 😄
+  Points have no cash value. Terms subject to vibes 😄
 </div>
 
-<script>
-  const data = JSON.parse(localStorage.getItem("pointsData")) || {
-    you: 0,
-    her: 0,
-    log: []
-  };
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import {
+    getFirestore,
+    doc,
+    getDoc,
+    setDoc,
+    updateDoc,
+    arrayUnion
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  function render() {
-    document.getElementById("youPoints").textContent = data.you;
-    document.getElementById("herPoints").textContent = data.her;
+  // 🔥 FIREBASE CONFIG (PASTE YOURS HERE)
+  const firebaseConfig = {
+  apiKey: "AIzaSyCEcUYPvTYPVFOJSKxc-BQq0aQ4mNn9QV4",
+  authDomain: "points-ledger-6b4a2.firebaseapp.com",
+  projectId: "points-ledger-6b4a2",
+  storageBucket: "points-ledger-6b4a2.firebasestorage.app",
+  messagingSenderId: "206943500903",
+  appId: "1:206943500903:web:c7a6772caa51cc94afb2c2"
+};
 
-    const logEl = document.getElementById("log");
-    logEl.innerHTML = "";
+  // 🔐 STORED PIN HASH (SHA-256)
+  const STORED_PIN_HASH = "b32e9fb81ce0d57edcc5b7ae2da77f06bc07020efbf896bd5984731b43bcf3c9";
 
-    data.log.forEach(entry => {
-      const li = document.createElement("li");
-      li.textContent = `${entry.date} — ${entry.text}`;
-      logEl.appendChild(li);
-    });
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const docRef = doc(db, "ledger", "main");
+
+  let data = { Aakarsh: 0, Rishika: 0, log: [] };
+
+  async function hashPin(pin) {
+    const encoded = new TextEncoder().encode(pin);
+    const buffer = await crypto.subtle.digest("SHA-256", encoded);
+    return Array.from(new Uint8Array(buffer))
+      .map(b => b.toString(16).padStart(2, "0"))
+      .join("");
   }
 
-  function addTransaction() {
-    const receiver = document.getElementById("receiver").value;
-    const points = parseInt(document.getElementById("points").value, 10);
-    const reason = document.getElementById("reason").value || "No reason";
+  async function getPinHash() {
+    const pin = do
 
-    if (isNaN(points)) return alert("Enter valid points");
-
-    data[receiver] += points;
-    data.log.unshift({
-      date: new Date().toLocaleString(),
-      text: `${receiver.toUpperCase()} ${points > 0 ? "+" : ""}${points} pts (${reason})`
-    });
-
-    saveAndRender();
-  }
-
-  function redeemPoints() {
-    const person = document.getElementById("redeemPerson").value;
-    const points = parseInt(document.getElementById("redeemPoints").value, 10);
-    const item = document.getElementById("redeemFor").value || "Something mysterious";
-
-    if (isNaN(points) || points <= 0) {
-      return alert("Enter valid redeem points");
-    }
-
-    if (data[person] < points) {
-      return alert("Not enough points 😬");
-    }
-
-    data[person] -= points;
-    data.log.unshift({
-      date: new Date().toLocaleString(),
-      text: `${person.toUpperCase()} redeemed ${points} pts for ${item}`
-    });
-
-    saveAndRender();
-  }
-
-  function saveAndRender() {
-    localStorage.setItem("pointsData", JSON.stringify(data));
-    render();
-  }
-
-  render();
-</script>
-
-</body>
-</html>
