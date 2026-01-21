@@ -132,13 +132,16 @@
     const points = parseInt(document.getElementById("points").value, 10);
     const reason = document.getElementById("reason").value;
 
-    if (receiver === "you") {
+    if (receiver === "Aakarsh") {
       data.Aakarsh += points;
     } else {
       data.Rishika += points;
     }
-
-    const entry = `${receiver === "you" ? "Aakarsh" : "Rishika"} ${points} points for ${reason}`;
+    let entry; 
+    if (points < 0) { 
+      entry = `${receiver === "Aakarsh" ? "Aakarsh" : "Rishika"} deducted ${Math.abs(points)} points for ${reason}`; } 
+    else { entry = `${receiver === "Aakarsh" ? "Aakarsh" : "Rishika"} rewarded ${points} points for ${reason}`; }
+    
     data.log.push(entry);
 
     await updateDoc(docRef, {
@@ -160,13 +163,13 @@
     const points = parseInt(document.getElementById("redeemPoints").value, 10);
     const redeemFor = document.getElementById("redeemFor").value;
 
-    if (person === "you") {
+    if (person === "Aakarsh") {
       data.Aakarsh -= points;
     } else {
       data.Rishika -= points;
     }
 
-    const entry = `${person === "you" ? "Aakarsh" : "Rishika"} redeemed ${points} points for ${redeemFor}`;
+    const entry = `${person === "Aakarsh" ? "Aakarsh" : "Rishika"} redeemed ${points} points for ${redeemFor}`;
     data.log.push(entry);
 
     await updateDoc(docRef, {
@@ -188,6 +191,7 @@
 
 </body>
 </html>
+
 
 
 
