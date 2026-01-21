@@ -1,0 +1,180 @@
+/* === Global Reset & Base === */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, sans-serif;
+  background: #f6f7fb;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+/* === Sidebar === */
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 220px;
+  background: #ffffff;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.08);
+  padding: 20px;
+  overflow-y: auto;
+  z-index: 999;
+}
+
+.sidebar h3 {
+  margin-top: 0;
+  text-align: center;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar li {
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+  background: #f6f7fb;
+  padding: 8px;
+  border-radius: 8px;
+}
+
+/* === Overlay for Mobile Sidebar === */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  display: none;
+  z-index: 998;
+}
+
+.overlay.show {
+  display: block;
+}
+
+/* === Toggle Button === */
+#toggleSidebar {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 1000;
+  background: #4f46e5;
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  display: none; /* hidden on desktop */
+}
+
+/* === Main Content === */
+.main {
+  margin-left: 240px;
+  padding: 20px;
+  max-width: 720px;
+}
+
+h1, h3 {
+  text-align: center;
+}
+
+.scoreboard {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.card {
+  background: white;
+  padding: 16px;
+  border-radius: 14px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+.points {
+  font-size: 2.2rem;
+  font-weight: bold;
+}
+
+.controls {
+  background: white;
+  padding: 16px;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  margin-bottom: 16px;
+}
+
+input, select, button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 8px;
+  font-size: 1rem;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: #4f46e5;
+  color: white;
+  margin-top: 12px;
+}
+
+button.redeem {
+  background: #16a34a;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  background: white;
+  margin-bottom: 8px;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+
+.footer {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 20px;
+}
+
+/* === Responsive (Mobile) === */
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  #toggleSidebar {
+    display: block;
+  }
+
+  .main {
+    margin-left: 0;
+  }
+}
