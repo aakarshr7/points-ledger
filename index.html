@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>🏆 Points Ledger</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --border: #e2e8f0;
+      /* Personal Themes */
+      --sage-bg: #f1f8f6;
+      --sage-text: #2d4a3e;
+      --pink-bg: #fdf2f8;
+      --pink-text: #831843;
+    }
+
+    .dark {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f1f5f9;
+      --border: #334155;
+      --sage-bg: #1a2e26;
+      --sage-text: #a7f3d0;
+      --pink-bg: #371b29;
+      --pink-text: #fbcfe8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); padding: 20px; transition: 0.3s; }
+
+    .dashboard {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 24px;
+    }
+
+    header { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; padding: 10px 0 20px; }
+
+    .main-column, .sidebar-column { display: flex; flex-direction: column; gap: 24px; }
+
+    .card { background: var(--card-bg); padding: 24px; border-radius: 24px; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+
+    /* Scoreboard Personal Themes */
+    .scoreboard { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    
+    .score-box.aakarsh { background: var(--sage-bg); border-color: transparent; color: var(--sage-text); }
+    .score-box.rishika { background: var(--pink-bg); border-color: transparent; color: var(--pink-text); }
+    
+    .points { font-size: 3.5rem; font-weight: 900; margin-top: 10px; }
+
+    .section-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; color: var(--primary); }
+
+    input, select { width: 100%; padding: 14px; margin-top: 8px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 1rem; }
+
+    button { width: 100%; padding: 14px; margin-top: 12px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
+    button:active { transform: scale(0.98); }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-success { background: #10b981; color: white; }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); width: auto; padding: 8px 16px; }
+
+    #log { list-style: none; }
+    .log-item { padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+    .log-meta { display: flex; justify-content: space-between; font-size: 0.7rem; opacity: 0.6; margin-bottom: 4px; }
+    
+    .badge { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; font-weight: 800; text-transform: uppercase; }
+    .badge-in { background: #dcfce7; color: #166534; }
+    .badge-out { background: #fee2e2; color: #991b1b; }
+
+    @media (max-width: 1000px) {
+      .dashboard { grid-template-columns: 1fr; }
+      .sidebar-column { order: 3; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="dashboard">
+  <header>
+    <h1>🏆 Ledger</h1>
+    <button id="darkToggle" class="btn-outline">
+      <span class="material-symbols-rounded">dark_mode</span> Theme
+    </button>
+  </header>
+
+  <div class="main-column">
+    <div class="scoreboard">
+      <div class="card score-box aakarsh">
+        <h3 style="display: flex; align-items: center; gap: 8px;">
+          <span class="material-symbols-rounded">eco</span> Aakarsh
+        </h3>
+        <div class="points" id="youPoints">0</div>
+      </div>
+      <div class="card score-box rishika">
+        <h3 style="display: flex; align-items: center; gap: 8px;">
+          <span class="material-symbols-rounded">favorite</span> Rishika
+        </h3>
+        <div class="points" id="herPoints">0</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="section-title"><span class="material-symbols-rounded">lock</span> Security</h3>
+      <input type="password" id="pin" placeholder="Enter System PIN" />
+    </div>
+
+    <div class="card">
+      <h3 class="section-title"><span class="material-symbols-rounded">analytics</span> Adjust Balance</h3>
+      <select id="receiver">
+        <option value="Aakarsh">Recipient: Aakarsh</option>
+        <option value="Rishika">Recipient: Rishika</option>
+      </select>
+      <input type="number" id="points" placeholder="Amount (e.g., 1000)" />
+      <input type="text" id="reason" placeholder="Transaction Reason" />
+      <button id="logBtn" class="btn-primary">
+        <span class="material-symbols-rounded">account_balance_wallet</span> Execute Entry
+      </button>
+    </div>
+
+    <div class="card">
+      <h3 class="section-title"><span class="material-symbols-rounded">redeem</span> Redemption</h3>
+      <select id="redeemPerson">
+        <option value="Aakarsh">Holder: Aakarsh</option>
+        <option value="Rishika">Holder: Rishika</option>
+      </select>
+      <input type="number" id="redeemPoints" placeholder="Redeem Value" />
+      <input type="text" id="redeemFor" placeholder="Exchange For..." />
+      <button id="redeemBtn" class="btn-success">
+        <span class="material-symbols-rounded">shopping_bag</span> Redeem Now
+      </button>
+    </div>
+  </div>
+
+  <div class="sidebar-column">
+    <aside class="card">
+      <h3 class="section-title"><span class="material-symbols-rounded">gavel</span> Protocol</h3>
+      <ul style="list-style: none; font-size: 0.9rem; opacity: 0.8;">
+        	<li style="margin-bottom: 8px;">➕ Points can be added or deducted with a valid reason.</li>
+    <li style="margin-bottom: 8px;">🔐 Transactions require the correct PIN.</li>
+    <li style="margin-bottom: 8px;">🎁 Redeem only if balance > 0.</li>
+    <li style="margin-bottom: 8px;">⚠️ Cannot redeem more points than available.</li>
+    <li style="margin-bottom: 8px;">🕒 All transactions are timestamped and logged.</li>
+    <li>💰 Points have no cash value.</li>
+      </ul>
+    </aside>
+
+    <section class="card">
+      <h3 class="section-title"><span class="material-symbols-rounded">history</span> Audit Log</h3>
+      <ul id="log"></ul>
+    </section>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCEcUYPvTYPVFOJSKxc-BQq0aQ4mNn9QV4",
+    authDomain: "points-ledger-6b4a2.firebaseapp.com",
+    projectId: "points-ledger-6b4a2",
+    storageBucket: "points-ledger-6b4a2.firebasestorage.app",
+    messagingSenderId: "206943500903",
+    appId: "1:206943500903:web:c7a6772caa51cc94afb2c2"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const docRef = doc(db, "ledger", "main");
+  const STORED_PIN_HASH = "b32e9fb81ce0d57edcc5b7ae2da77f06bc07020efbf896bd5984731b43bcf3c9";
+
+  let data = { Aakarsh: 0, Rishika: 0, log: [] };
+
+  if (localStorage.getItem("darkMode") === "on") document.body.classList.add("dark");
+  document.getElementById("darkToggle").onclick = () => {
+    document.body.classList.toggle("dark");
+    localStorage.setItem("darkMode", document.body.classList.contains("dark") ? "on" : "off");
+  };
+
+  async function hashPin(pin) {
+    const encoded = new TextEncoder().encode(pin);
+    const buffer = await crypto.subtle.digest("SHA-256", encoded);
+    return Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2, "0")).join("");
+  }
+
+  async function checkPin() {
+    const pin = document.getElementById("pin").value;
+    return (await hashPin(pin)) === STORED_PIN_HASH;
+  }
+
+  async function loadData() {
+    const snap = await getDoc(docRef);
+    if (snap.exists()) {
+      data = snap.data();
+      document.getElementById("youPoints").textContent = data.Aakarsh.toLocaleString();
+      document.getElementById("herPoints").textContent = data.Rishika.toLocaleString();
+      const logEl = document.getElementById("log");
+      logEl.innerHTML = "";
+      [...data.log].reverse().forEach(item => {
+        const isOut = item.message.includes('Debited') || item.message.includes('redeemed');
+        const li = document.createElement("li");
+        li.className = "log-item";
+        li.innerHTML = `
+          <div class="log-meta">
+            <span class="badge ${isOut ? 'badge-out' : 'badge-in'}">${isOut ? 'Debit' : 'Credit'}</span>
+            <span>${item.displayTime}</span>
+          </div>
+          <div>${item.message}</div>
+        `;
+        logEl.appendChild(li);
+      });
+    } else {
+      await setDoc(docRef, data);
+    }
+  }
+
+  document.getElementById("logBtn").onclick = async () => {
+    if (!(await checkPin())) return alert("Access Denied");
+    const person = document.getElementById("receiver").value;
+    const val = parseInt(document.getElementById("points").value);
+    const msg = `${val < 0 ? 'Debited' : 'Credited'} ${Math.abs(val)} to ${person}: ${document.getElementById("reason").value}`;
+    if (person === "Aakarsh") data.Aakarsh += val; else data.Rishika += val;
+    await updateDoc(docRef, { Aakarsh: data.Aakarsh, Rishika: data.Rishika, log: arrayUnion({ message: msg, displayTime: new Date().toLocaleString(), sortTime: new Date().toISOString() }) });
+    loadData();
+  };
+
+  document.getElementById("redeemBtn").onclick = async () => {
+    if (!(await checkPin())) return alert("Access Denied");
+    const person = document.getElementById("redeemPerson").value;
+    const val = parseInt(document.getElementById("redeemPoints").value);
+    const balance = person === "Aakarsh" ? data.Aakarsh : data.Rishika;
+    if (val > balance || val <= 0) return alert("Insufficient Funds");
+    if (person === "Aakarsh") data.Aakarsh -= val; else data.Rishika -= val;
+    await updateDoc(docRef, { Aakarsh: data.Aakarsh, Rishika: data.Rishika, log: arrayUnion({ message: `${person} redeemed ${val} for ${document.getElementById("redeemFor").value}`, displayTime: new Date().toLocaleString(), sortTime: new Date().toISOString() }) });
+    loadData();
+  };
+
+  loadData();
+</script>
+</body>
+</html>
