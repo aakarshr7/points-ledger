@@ -42,8 +42,8 @@
 <div class="controls">
   <h3>➕ Add / Deduct Points</h3>
   <select id="receiver">
-    <option value="you">Aakarsh</option>
-    <option value="her">Rishika</option>
+    <option value="Aakarsh">Aakarsh</option>
+    <option value="Rishika">Rishika</option>
   </select>
   <input type="number" id="points" placeholder="e.g. 5000 (negative allowed)" />
   <input type="text" id="reason" placeholder="Reason" />
@@ -53,8 +53,8 @@
 <div class="controls">
   <h3>🎁 Redeem Points</h3>
   <select id="redeemPerson">
-    <option value="you">Aakarsh</option>
-    <option value="her">Rishika</option>
+    <option value="Aakarsh">Aakarsh</option>
+    <option value="Rishika">Rishika</option>
   </select>
   <input type="number" id="redeemPoints" placeholder="Points to redeem" />
   <input type="text" id="redeemFor" placeholder="Redeemed for (coffee, favor…)" />
@@ -139,8 +139,8 @@
     }
     let entry; 
     if (points < 0) { 
-      entry = `${receiver === "Aakarsh" ? "Aakarsh" : "Rishika"} deducted ${Math.abs(points)} points for ${reason}`; } 
-    else { entry = `${receiver === "Aakarsh" ? "Aakarsh" : "Rishika"} rewarded ${points} points for ${reason}`; }
+      entry = `${receiver === "Aakarsh" ? "Aakarsh" : "Rishika"} -- deducted ${Math.abs(points)} points from ${receiver} for ${reason}`; } 
+    else { entry = `${receiver === "Aakarsh" ? "Aakarsh" : "Rishika"} -- rewarded ${points} points to to ${receiver} for ${reason}`; }
     
     data.log.push(entry);
 
@@ -169,7 +169,7 @@
       data.Rishika -= points;
     }
 
-    const entry = `${person === "Aakarsh" ? "Aakarsh" : "Rishika"} redeemed ${points} points for ${redeemFor}`;
+    const entry = `${person === "Aakarsh" ? "Aakarsh" : "Rishika"} -- redeemed ${points} points for ${redeemFor}`;
     data.log.push(entry);
 
     await updateDoc(docRef, {
@@ -191,6 +191,7 @@
 
 </body>
 </html>
+
 
 
 
