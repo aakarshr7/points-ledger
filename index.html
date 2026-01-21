@@ -153,9 +153,9 @@
   // ✅ Different message depending on positive or negative points
   let message;
   if (points < 0) {
-    message = `{displayTime} ... ${receiver === "Aakarsh" ? "Rishika" : "Aakarsh"} -- deducted ${Math.abs(points)} points from ${receiver} for ${reason}`;
+    message = `{displayTime} ... ${receiver === "Aakarsh" ? "Rishika" : "Aakarsh"} --  debited ${Math.abs(points)} points from ${receiver} for ${reason}`;
   } else {
-    message = `{displayTime} ... ${receiver === "Aakarsh" ? "Rishika" : "Aakarsh"} -- rewarded ${points} points to ${receiver} for ${reason}`;
+    message = `{displayTime} ... ${receiver === "Aakarsh" ? "Rishika" : "Aakarsh"} -- credited ${points} points to ${receiver} for ${reason}`;
   }
 
   // Transaction object with both fields
@@ -228,6 +228,7 @@
 
 </body>
 </html>
+
 
 
 
