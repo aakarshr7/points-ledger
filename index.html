@@ -4,89 +4,19 @@
   <meta charset="UTF-8" />
   <title>🏆 Points Ledger</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
   <style>
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #f6f7fb;
-      padding: 20px;
-      max-width: 720px;
-      margin: auto;
-    }
-
-    h1, h3 {
-      text-align: center;
-    }
-
-    .scoreboard {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      margin: 20px 0;
-    }
-
-    .card {
-      background: white;
-      padding: 16px;
-      border-radius: 14px;
-      width: 100%;
-      text-align: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-    }
-
-    .points {
-      font-size: 2.2rem;
-      font-weight: bold;
-    }
-
-    .controls {
-      background: white;
-      padding: 16px;
-      border-radius: 14px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-      margin-bottom: 16px;
-    }
-
-    input, select, button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 8px;
-      font-size: 1rem;
-    }
-
-    button {
-      cursor: pointer;
-      border-radius: 10px;
-      border: none;
-      background: #4f46e5;
-      color: white;
-      margin-top: 12px;
-    }
-
-    button.redeem {
-      background: #16a34a;
-    }
-
-    ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    li {
-      background: white;
-      margin-bottom: 8px;
-      padding: 10px;
-      border-radius: 10px;
-      font-size: 0.9rem;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-    }
-
-    .footer {
-      text-align: center;
-      font-size: 0.8rem;
-      color: #666;
-      margin-top: 20px;
-    }
+    body { font-family: system-ui, sans-serif; background: #f6f7fb; padding: 20px; max-width: 720px; margin: auto; }
+    h1, h3 { text-align: center; }
+    .scoreboard { display: flex; justify-content: space-between; gap: 12px; margin: 20px 0; }
+    .card { background: white; padding: 16px; border-radius: 14px; width: 100%; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+    .points { font-size: 2.2rem; font-weight: bold; }
+    .controls { background: white; padding: 16px; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); margin-bottom: 16px; }
+    input, select, button { width: 100%; padding: 10px; margin-top: 8px; font-size: 1rem; }
+    button { cursor: pointer; border-radius: 10px; border: none; background: #4f46e5; color: white; margin-top: 12px; }
+    button.redeem { background: #16a34a; }
+    ul { list-style: none; padding: 0; }
+    li { background: white; margin-bottom: 8px; padding: 10px; border-radius: 10px; font-size: 0.9rem; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
+    .footer { text-align: center; font-size: 0.8rem; color: #666; margin-top: 20px; }
   </style>
 </head>
 <body>
@@ -111,30 +41,24 @@
 
 <div class="controls">
   <h3>➕ Add / Deduct Points</h3>
-
   <select id="receiver">
     <option value="you">Aakarsh</option>
     <option value="her">Rishika</option>
   </select>
-
   <input type="number" id="points" placeholder="e.g. 5000 (negative allowed)" />
   <input type="text" id="reason" placeholder="Reason" />
-
-  <button onclick="addTransaction()">Log Transaction</button>
+  <button id="logBtn">Log Transaction</button>
 </div>
 
 <div class="controls">
   <h3>🎁 Redeem Points</h3>
-
   <select id="redeemPerson">
     <option value="you">Aakarsh</option>
     <option value="her">Rishika</option>
   </select>
-
   <input type="number" id="redeemPoints" placeholder="Points to redeem" />
   <input type="text" id="redeemFor" placeholder="Redeemed for (coffee, favor…)" />
-
-  <button class="redeem" onclick="redeemPoints()">Redeem</button>
+  <button class="redeem" id="redeemBtn">Redeem</button>
 </div>
 
 <h3>📜 Transaction History</h3>
@@ -146,14 +70,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import {
-    getFirestore,
-    doc,
-    getDoc,
-    setDoc,
-    updateDoc,
-    arrayUnion
-  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
   // 🔥 FIREBASE CONFIG (PASTE YOURS HERE)
   const firebaseConfig = {
@@ -165,12 +82,12 @@
   appId: "1:206943500903:web:c7a6772caa51cc94afb2c2"
 };
 
-  // 🔐 STORED PIN HASH (SHA-256)
-  const STORED_PIN_HASH = "b32e9fb81ce0d57edcc5b7ae2da77f06bc07020efbf896bd5984731b43bcf3c9";
-
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   const docRef = doc(db, "ledger", "main");
+
+  // 🔐 Stored PIN hash (replace with actual SHA-256 hash of your PIN)
+  const STORED_PIN_HASH = "b32e9fb81ce0d57edcc5b7ae2da77f06bc07020efbf896bd5984731b43bcf3c9";
 
   let data = { Aakarsh: 0, Rishika: 0, log: [] };
 
@@ -182,6 +99,96 @@
       .join("");
   }
 
-  async function getPinHash() {
-    const pin = do
+  async function checkPin() {
+    const pin = document.getElementById("pin").value;
+    const enteredHash = await hashPin(pin);
+    return enteredHash === STORED_PIN_HASH;
+  }
+
+  async function loadData() {
+    const snap = await getDoc(docRef);
+    if (snap.exists()) {
+      data = snap.data();
+      document.getElementById("youPoints").textContent = data.Aakarsh;
+      document.getElementById("herPoints").textContent = data.Rishika;
+      document.getElementById("log").innerHTML = "";
+      data.log.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        document.getElementById("log").appendChild(li);
+      });
+    } else {
+      await setDoc(docRef, data);
+    }
+  }
+
+  async function addTransaction() {
+    if (!(await checkPin())) {
+      alert("❌ Incorrect PIN");
+      return;
+    }
+
+    const receiver = document.getElementById("receiver").value;
+    const points = parseInt(document.getElementById("points").value, 10);
+    const reason = document.getElementById("reason").value;
+
+    if (receiver === "you") {
+      data.Aakarsh += points;
+    } else {
+      data.Rishika += points;
+    }
+
+    const entry = `${receiver === "you" ? "Aakarsh" : "Rishika"} ${points} points for ${reason}`;
+    data.log.push(entry);
+
+    await updateDoc(docRef, {
+      Aakarsh: data.Aakarsh,
+      Rishika: data.Rishika,
+      log: arrayUnion(entry)
+    });
+
+    loadData();
+  }
+
+  async function redeemPoints() {
+    if (!(await checkPin())) {
+      alert("❌ Incorrect PIN");
+      return;
+    }
+
+    const person = document.getElementById("redeemPerson").value;
+    const points = parseInt(document.getElementById("redeemPoints").value, 10);
+    const redeemFor = document.getElementById("redeemFor").value;
+
+    if (person === "you") {
+      data.Aakarsh -= points;
+    } else {
+      data.Rishika -= points;
+    }
+
+    const entry = `${person === "you" ? "Aakarsh" : "Rishika"} redeemed ${points} points for ${redeemFor}`;
+    data.log.push(entry);
+
+    await updateDoc(docRef, {
+      Aakarsh: data.Aakarsh,
+      Rishika: data.Rishika,
+      log: arrayUnion(entry)
+    });
+
+    loadData();
+  }
+
+  // Attach event listeners
+  document.getElementById("logBtn").addEventListener("click", addTransaction);
+  document.getElementById("redeemBtn").addEventListener("click", redeemPoints);
+
+  // Load initial data
+  loadData();
+</script>
+
+</body>
+</html>
+
+
+
 
